@@ -122,7 +122,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
-  stepNumber: { fontSize: 16, fontWeight: '700', color: colors.accent, lineHeight: 24, width: 24 },
+  stepNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.accent,
+    lineHeight: 24,
+    width: 30,
+    flexShrink: 0,
+  },
   stepText: { ...typography.body, flex: 1, lineHeight: 24 },
   addBtn: {
     flexDirection: 'row',

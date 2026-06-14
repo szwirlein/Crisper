@@ -69,10 +69,23 @@ export function ShoppingListScreen() {
           <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
             <View style={styles.titleRow}>
               <Text style={styles.title}>Shopping{'\n'}List</Text>
-              <View style={styles.counter}>
-                <Text style={styles.counterValue}>{uncheckedCount}</Text>
-                <Text style={styles.counterLabel}>Remaining</Text>
-              </View>
+              {uncheckedCount > 0 ? (
+                <View style={styles.counter}>
+                  <Text style={styles.counterValue}>{uncheckedCount}</Text>
+                  <Text style={styles.counterLabel}>Remaining</Text>
+                </View>
+              ) : (
+                <View style={styles.statusBadge}>
+                  <Ionicons
+                    name={items.length === 0 ? 'cart-outline' : 'checkmark-circle'}
+                    size={15}
+                    color={colors.accent}
+                  />
+                  <Text style={styles.statusText}>
+                    {items.length === 0 ? 'Empty list' : 'Fully stocked'}
+                  </Text>
+                </View>
+              )}
             </View>
             <AccentBar />
           </View>
@@ -140,6 +153,17 @@ const styles = StyleSheet.create({
   counter: { alignItems: 'flex-end', paddingTop: 6 },
   counterValue: { ...typography.counter },
   counterLabel: { ...typography.label, marginTop: 2 },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: 'rgba(78, 124, 95, 0.1)',
+  },
+  statusText: { fontSize: 13, fontWeight: '600', color: colors.accent },
   sectionLabel: { ...typography.label, marginTop: 20, marginBottom: 4 },
   row: {
     flexDirection: 'row',
