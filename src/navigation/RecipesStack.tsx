@@ -8,17 +8,9 @@ const Stack = createNativeStackNavigator<RecipesStackParamList>();
 
 export function RecipesStack() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="RecipesList"
-        component={RecipesListScreen}
-        options={{ title: 'Recipes' }}
-      />
-      <Stack.Screen
-        name="RecipeDetail"
-        component={RecipeDetailScreen}
-        options={{ title: '', headerBackTitle: 'Recipes' }}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="RecipesList" component={RecipesListScreen} />
+      <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
     </Stack.Navigator>
   );
 }

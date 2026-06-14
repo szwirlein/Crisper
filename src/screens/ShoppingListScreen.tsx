@@ -1,33 +1,38 @@
 import React, { useMemo, useState } from 'react';
 import {
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  SectionList,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useShoppingList } from '../context/ShoppingListContext';
 import { ShoppingItem } from '../types';
+import { AccentBar } from '../components/AccentBar';
+import { colors, radius, spacing, typography } from '../theme';
 
 const MAX_ITEM_LENGTH = 100;
 
 export function ShoppingListScreen() {
-  const { items, addItem, toggleItem, clearBought } = useShoppingList();
+  const { items, uncheckedCount, addItem, toggleItem, clearBought } = useShoppingList();
   const [draft, setDraft] = useState('');
   const insets = useSafeAreaInsets();
 
-  // Unchecked stay in insertion order at the top; checked sink to the bottom.
-  const ordered = useMemo(() => {
+  const sections = useMemo(() => {
     const unchecked = items.filter((i) => !i.checked);
     const checked = items.filter((i) => i.checked);
-    return [...unchecked, ...checked];
+    return [
+      { key: 'to-buy', title: 'To buy', data: unchecked },
+      { key: 'in-basket', title: 'In basket', data: checked },
+    ].filter((s) => s.data.length > 0);
   }, [items]);
 
-  const checkedCount = items.length - ordered.filter((i) => !i.checked).length;
+  const checkedCount = items.length - uncheckedCount;
 
   const handleAdd = () => {
     if (!draft.trim()) return;
@@ -41,11 +46,9 @@ export function ShoppingListScreen() {
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
     >
       <View style={[styles.checkbox, item.checked && styles.checkboxChecked]}>
-        {item.checked ? <Text style={styles.checkmark}>✓</Text> : null}
+        {item.checked ? <Ionicons name="checkmark" size={15} color={colors.accentText} /> : null}
       </View>
-      <Text style={[styles.itemText, item.checked && styles.itemTextChecked]}>
-        {item.text}
-      </Text>
+      <Text style={[styles.itemText, item.checked && styles.itemTextChecked]}>{item.text}</Text>
     </Pressable>
   );
 
@@ -53,137 +56,146 @@ export function ShoppingListScreen() {
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={insets.top + 44}
+      keyboardVerticalOffset={insets.top}
     >
-      <View style={styles.flex}>
-        <FlatList
-          data={ordered}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={styles.emptyTitle}>Your list is empty</Text>
-              <Text style={styles.emptyBody}>
-                Add an item below, or pull ingredients in from the Recipes tab.
-              </Text>
+      <SectionList
+        sections={sections}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        stickySectionHeadersEnabled={false}
+        contentContainerStyle={styles.listContent}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>Shopping{'\n'}List</Text>
+              <View style={styles.counter}>
+                <Text style={styles.counterValue}>{uncheckedCount}</Text>
+                <Text style={styles.counterLabel}>Remaining</Text>
+              </View>
             </View>
-          }
-          keyboardShouldPersistTaps="handled"
-        />
-
-        {checkedCount > 0 ? (
-          <View style={styles.clearWrap}>
+            <AccentBar />
+          </View>
+        }
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.sectionLabel}>{section.title}</Text>
+        )}
+        renderSectionFooter={({ section }) =>
+          section.key === 'in-basket' && checkedCount > 0 ? (
             <Pressable
               onPress={clearBought}
-              style={({ pressed }) => [styles.clearBtn, pressed && styles.clearBtnPressed]}
+              style={({ pressed }) => [styles.clearBtn, pressed && styles.rowPressed]}
+              hitSlop={6}
             >
-              <Text style={styles.clearBtnText}>
-                Clear bought ({checkedCount})
-              </Text>
+              <Text style={styles.clearBtnText}>Clear bought ({checkedCount})</Text>
             </Pressable>
+          ) : null
+        }
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>Your list is empty</Text>
+            <Text style={styles.emptyBody}>
+              Add an item below, or pull ingredients in from the Recipes tab.
+            </Text>
           </View>
-        ) : null}
+        }
+      />
 
-        <View style={[styles.inputBar, { paddingBottom: insets.bottom > 0 ? 8 : 12 }]}>
+      <View style={[styles.inputBar, { paddingBottom: insets.bottom > 0 ? insets.bottom : 12 }]}>
+        <View style={styles.inputWrap}>
+          <Ionicons name="add" size={18} color={colors.textDisabled} />
           <TextInput
             style={styles.input}
             value={draft}
             onChangeText={setDraft}
             placeholder="Add an item…"
-            placeholderTextColor="#9aa0a6"
+            placeholderTextColor={colors.textDisabled}
             returnKeyType="done"
             maxLength={MAX_ITEM_LENGTH}
             onSubmitEditing={handleAdd}
           />
-          <Pressable
-            onPress={handleAdd}
-            disabled={!draft.trim()}
-            style={({ pressed }) => [
-              styles.addBtn,
-              !draft.trim() && styles.addBtnDisabled,
-              pressed && draft.trim() && styles.addBtnPressed,
-            ]}
-          >
-            <Text style={styles.addBtnText}>Add</Text>
-          </Pressable>
         </View>
+        <Pressable
+          onPress={handleAdd}
+          disabled={!draft.trim()}
+          style={({ pressed }) => [
+            styles.addBtn,
+            !draft.trim() && styles.addBtnDisabled,
+            pressed && draft.trim() && styles.addBtnPressed,
+          ]}
+        >
+          <Ionicons name="add" size={22} color={colors.accentText} />
+        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#f2f2f7' },
-  listContent: { paddingVertical: 8, flexGrow: 1 },
+  flex: { flex: 1, backgroundColor: colors.background },
+  listContent: { paddingHorizontal: spacing.screenX, flexGrow: 1 },
+  header: { paddingBottom: 4 },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  title: { ...typography.title },
+  counter: { alignItems: 'flex-end', paddingTop: 6 },
+  counterValue: { ...typography.counter },
+  counterLabel: { ...typography.label, marginTop: 2 },
+  sectionLabel: { ...typography.label, marginTop: 20, marginBottom: 4 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    marginHorizontal: 12,
-    marginVertical: 4,
-    borderRadius: 12,
+    gap: 14,
+    paddingVertical: 15,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  rowPressed: { backgroundColor: '#ececf1' },
+  rowPressed: { opacity: 0.55 },
   checkbox: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#c4c4c9',
+    borderColor: colors.checkboxBorder,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
   },
-  checkboxChecked: { backgroundColor: '#34c759', borderColor: '#34c759' },
-  checkmark: { color: '#fff', fontSize: 15, fontWeight: '800', lineHeight: 18 },
-  itemText: { fontSize: 17, color: '#1c1c1e', flexShrink: 1 },
-  itemTextChecked: {
-    textDecorationLine: 'line-through',
-    color: '#b0b0b5',
-  },
-  empty: { alignItems: 'center', paddingTop: 80, paddingHorizontal: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#3c3c43', marginBottom: 8 },
-  emptyBody: { fontSize: 15, color: '#8e8e93', textAlign: 'center', lineHeight: 21 },
-  clearWrap: { paddingHorizontal: 12, paddingBottom: 6 },
-  clearBtn: {
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 12,
-    backgroundColor: '#fff',
-  },
-  clearBtnPressed: { backgroundColor: '#ececf1' },
-  clearBtnText: { color: '#ff3b30', fontSize: 16, fontWeight: '600' },
+  checkboxChecked: { backgroundColor: colors.accent, borderColor: colors.accent },
+  itemText: { ...typography.body, flex: 1 },
+  itemTextChecked: { textDecorationLine: 'line-through', color: colors.textDisabled },
+  clearBtn: { paddingVertical: 16 },
+  clearBtnText: { fontSize: 14, fontWeight: '600', color: colors.accent },
+  empty: { alignItems: 'center', paddingTop: 64, paddingHorizontal: 24 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 8 },
+  emptyBody: { fontSize: 15, color: colors.textMuted, textAlign: 'center', lineHeight: 21 },
   inputBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingTop: 8,
+    gap: 12,
+    paddingHorizontal: spacing.screenX,
+    paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#d1d1d6',
-    backgroundColor: '#f9f9fb',
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
   },
-  input: {
+  inputWrap: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.inputBackground,
+    borderRadius: radius.input,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 17,
-    color: '#1c1c1e',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d1d1d6',
   },
+  input: { flex: 1, fontSize: 15, color: colors.text, padding: 0 },
   addBtn: {
-    marginLeft: 10,
-    backgroundColor: '#007aff',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 10,
+    width: 46,
+    height: 46,
+    borderRadius: radius.input,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  addBtnPressed: { backgroundColor: '#0066d6' },
-  addBtnDisabled: { backgroundColor: '#b9d6ff' },
-  addBtnText: { color: '#fff', fontSize: 17, fontWeight: '600' },
+  addBtnPressed: { opacity: 0.85 },
+  addBtnDisabled: { backgroundColor: '#bcd0c3' },
 });

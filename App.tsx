@@ -7,6 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { ShoppingListProvider, useShoppingList } from './src/context/ShoppingListContext';
 import { RecipesStack } from './src/navigation/RecipesStack';
 import { ShoppingListScreen } from './src/screens/ShoppingListScreen';
+import { colors } from './src/theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,7 +16,17 @@ function RootTabs() {
 
   return (
     <Tab.Navigator
-      screenOptions={{ tabBarActiveTintColor: '#007aff' }}
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.textDisabled,
+        tabBarStyle: {
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarBadgeStyle: { backgroundColor: colors.accent },
+      }}
     >
       <Tab.Screen
         name="ShoppingListTab"
@@ -23,8 +34,8 @@ function RootTabs() {
         options={{
           title: 'Shopping List',
           tabBarBadge: uncheckedCount > 0 ? uncheckedCount : undefined,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cart-outline" color={color} size={size} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name={focused ? 'reader' : 'reader-outline'} color={color} size={size} />
           ),
         }}
       />
@@ -33,9 +44,12 @@ function RootTabs() {
         component={RecipesStack}
         options={{
           title: 'Recipes',
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="restaurant-outline" color={color} size={size} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? 'restaurant' : 'restaurant-outline'}
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
