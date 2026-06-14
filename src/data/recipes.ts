@@ -1,0 +1,73 @@
+import { Recipe } from '../types';
+
+export const RECIPES: Recipe[] = [
+  {
+    id: 'spaghetti-aglio-olio',
+    name: 'Spaghetti Aglio e Olio',
+    ingredients: [
+      '400g spaghetti',
+      '6 cloves garlic',
+      '120ml olive oil',
+      '1 tsp chilli flakes',
+      'Handful fresh parsley',
+      'Salt',
+    ],
+    instructions: [
+      'Boil the spaghetti in well-salted water until al dente.',
+      'Meanwhile, gently fry the thinly sliced garlic and chilli flakes in olive oil until golden.',
+      'Drain the pasta, reserving a splash of cooking water.',
+      'Toss the pasta in the garlic oil with a little pasta water, then stir through the chopped parsley.',
+    ],
+  },
+  {
+    id: 'avocado-toast',
+    name: 'Avocado Toast',
+    ingredients: [
+      '2 slices sourdough bread',
+      '1 ripe avocado',
+      '1 lemon',
+      'Salt',
+      'Black pepper',
+    ],
+    instructions: [
+      'Toast the sourdough.',
+      'Mash the avocado with a squeeze of lemon, salt and pepper.',
+      'Spread onto the toast.',
+    ],
+  },
+  {
+    id: 'sunday-roast-chicken',
+    name: 'Sunday Roast Chicken with All the Trimmings',
+    ingredients: [
+      '1 whole chicken (about 1.6kg)',
+      '50g butter, softened',
+      '1 lemon',
+      '4 sprigs fresh thyme',
+      '1.5kg roasting potatoes',
+      '4 tbsp goose fat or olive oil',
+      '500g carrots',
+      '400g parsnips',
+      '300g Brussels sprouts',
+      '200g streaky bacon',
+      '2 onions',
+      '4 cloves garlic',
+      '500ml chicken stock',
+      '2 tbsp plain flour',
+      '1 tbsp redcurrant jelly',
+      'Salt',
+      'Black pepper',
+      'Olive oil',
+    ],
+    instructions: [
+      'Heat the oven to 200C fan. Rub the chicken all over with softened butter, season generously, and stuff the cavity with the halved lemon and thyme.',
+      'Sit the chicken on a bed of halved onions and garlic in a roasting tin and roast for about 1 hour 20 minutes, until the juices run clear.',
+      'Meanwhile, peel and chop the potatoes, parboil for 8 minutes, then drain and shake to roughen the edges.',
+      'Heat the goose fat in a roasting tin, add the potatoes, turn to coat, and roast for 45-55 minutes until crisp and golden, turning once.',
+      'Peel and chop the carrots and parsnips, toss in olive oil and season, and roast for 35-40 minutes.',
+      'Wrap the Brussels sprouts in streaky bacon and roast for the last 20 minutes, or pan-fry until tender.',
+      'Rest the cooked chicken under foil for 15 minutes. Tip the resting juices into the roasting tin.',
+      'Make the gravy: spoon off excess fat, stir the flour into the pan juices, gradually add the stock and redcurrant jelly, and simmer until thickened. Season to taste.',
+      'Carve the chicken and serve with the roast potatoes, carrots, parsnips, bacon-wrapped sprouts and plenty of gravy.',
+    ],
+  },
+];

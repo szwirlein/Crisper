@@ -1,20 +1,57 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { ShoppingListProvider, useShoppingList } from './src/context/ShoppingListContext';
+import { RecipesStack } from './src/navigation/RecipesStack';
+import { ShoppingListScreen } from './src/screens/ShoppingListScreen';
 
-export default function App() {
+const Tab = createBottomTabNavigator();
+
+function RootTabs() {
+  const { uncheckedCount } = useShoppingList();
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator
+      screenOptions={{ tabBarActiveTintColor: '#007aff' }}
+    >
+      <Tab.Screen
+        name="ShoppingListTab"
+        component={ShoppingListScreen}
+        options={{
+          title: 'Shopping List',
+          tabBarBadge: uncheckedCount > 0 ? uncheckedCount : undefined,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cart-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="RecipesTab"
+        component={RecipesStack}
+        options={{
+          title: 'Recipes',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="restaurant-outline" color={color} size={size} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ShoppingListProvider>
+        <NavigationContainer>
+          <RootTabs />
+        </NavigationContainer>
+        <StatusBar style="dark" />
+      </ShoppingListProvider>
+    </SafeAreaProvider>
+  );
+}
